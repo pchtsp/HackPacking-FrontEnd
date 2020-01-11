@@ -142,8 +142,8 @@ const Step7 = props => {
                                               streetAddress1:
                                                 billingAddress.streetAddress1
                                             },
-                                            gateway: "Dummy",
-                                            token
+                                            gateway: "Culqi",
+                                            token: token
                                           }
                                         }
                                       });
