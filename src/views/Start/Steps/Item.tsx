@@ -36,7 +36,8 @@ class ItemSteps extends React.Component {
   componentWillReceiveProps(newProps) {
     if (this.props !== newProps) {
       this.setState({
-        countItem: Number(this.props.countItem)
+        countItem: Number(this.props.countItem),
+        variant: newProps.variant,
       });
     }
   }
@@ -111,6 +112,7 @@ class ItemSteps extends React.Component {
     const { variant: variantId } = this.state;
     const { variants } = item;
     const { loading } = this.props.cart;
+    console.log('id', variantId);
     var variantImage = null;
     variants.map((variant, index) => {
       if (variant.id == variantId) {
