@@ -10,8 +10,6 @@ class Wrapper extends React.Component {
     this.onRemove = this.onRemove.bind(this);
   }
   async onAdd(cart, variant, count = 1) {
-    console.log('cart', cart);
-    console.log('variant', variant);
     await cart.clearErrors();
     await cart.add(variant, count);
   }
@@ -63,7 +61,6 @@ class Wrapper extends React.Component {
   render() {
     const { data, title, subTitle, meta, cart, male } = this.props;
     const edges = data.products.edges.filter(x => this.filterProduct(x));
-    console.log('edges', edges);
     return (
       <MetaWrapper
         meta={{

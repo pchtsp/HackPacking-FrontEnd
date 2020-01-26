@@ -3,10 +3,14 @@ import * as React from "react";
 import { LineI } from "../../../../components/CartTable/ProductRow";
 
 const Line: React.FC<Omit<LineI, "totalPrice">> = props => {
-  const { id, product, pricing, name, quantity, cart } = props;
+  const { id, product, pricing, name, quantity, variants, cart } = props;
   const { loading } = cart;
-  var color = name.split("/")[0].toLowerCase();
-  return (
+  let productVariant = [];
+    var color = name.split("/")[0].toLowerCase();
+    if (variants) {
+        productVariant = variants.filter(variant => variant.isAvailable);
+    }
+    return (
     <tr key={id}>
       <td style={{ textAlign: "start" }}>{product.name}</td>
       <td style={{ display: "flex", justifyContent: "center" }}>
@@ -48,11 +52,30 @@ const Line: React.FC<Omit<LineI, "totalPrice">> = props => {
           className="color-point"
           style={{
             backgroundColor: color,
-            margin: "0 auto"
+            margin: "0 auto",
           }}
         />
       </td>
-      <td style={{ textAlign: "center" }}>{name ? `(${name})` : null}</td>
+      <td style={{ textAlign: "center" }}>
+          <span className="overview-talla-item">
+            <select
+                name="select"
+                onChange={!loading ? (e) => props.onChangeItem(id, e.target.value, quantity) : () => {}}
+            >
+              {productVariant.map((variant, index) => {
+                  return (
+                      <option
+                          key={`sizes-${index}`}
+                          value={variant.id}
+                          selected={variant.id === id}
+                      >
+                          {variant.name}
+                      </option>
+                  );
+              })}
+            </select>
+          </span>
+      </td>
       <td style={{ textAlign: "end" }}>{pricing.price.gross.localized}</td>
       <td>
         <div

@@ -9,13 +9,18 @@ import Line from "./Line";
 import Subtotal from "./Subtotal";
 
 const removeToItem = async ( cart ,id)=>{
-  await cart.clearErrors()
-    await cart.subtract(id) 
-}
+  await cart.clearErrors();
+  await cart.subtract(id) ;
+};
 const addToItem= async (cart, id )=>{
-  await cart.clearErrors()
-    await cart.add(id) 
-}
+  await cart.clearErrors();
+  await cart.add(id);
+};
+const replaceItem = async (cart, id, newId, quantity) => {
+  await cart.clearErrors();
+  await cart.remove(id);
+  await cart.add(newId, quantity);
+};
 const Cart: React.FC<{
   cart: CartInterface;
   checkout: Checkout | null;
@@ -27,7 +32,7 @@ const Cart: React.FC<{
         <TypedProductVariantsQuery
           variables={{ ids: lines.map(line => line.variantId) }}
         >
-          {(response) => 
+          {(response) =>
           {
             const { data } = response;
             return(
@@ -47,6 +52,7 @@ const Cart: React.FC<{
                   <Line
                     key={node.id}
                     {...node}
+                    variants={node.product.variants}
                     quantity={
                       lines.find(({ variantId }) => variantId === node.id) ?
                       lines.find(({ variantId }) => variantId === node.id).quantity : 0
@@ -54,6 +60,7 @@ const Cart: React.FC<{
                     cart={cart}
                     removeToItem={ ( id )=> removeToItem( cart, id ) }
                     addToItem={ ( id )=> addToItem( cart, id ) }
+                    onChangeItem={(id, newId, quantity) => replaceItem(cart, id, newId, quantity)}
                   />)
                 ) :
                 null
@@ -81,17 +88,24 @@ const Cart: React.FC<{
                 <th style={{ textAlign: "center" }}>Size</th>
                 <th style={{ textAlign: "end" }}>Total</th>
               </tr>
-              {checkout.lines.map(({ variant, quantity, id }) => (
-            <Line key={id} {...variant} quantity={quantity} cart={cart}
-                    removeToItem={ ( id )=> removeToItem( cart, id ) }
-                    addToItem={ ( id )=> addToItem( cart, id ) }
-            />
-          ))}
+              {checkout.lines.map(({ variant, quantity, id }) => {
+                  return (
+                    <Line
+                        key={id}
+                        {...variant}
+                        variants={variant.product.variants}
+                        quantity={quantity}
+                        cart={cart}
+                        removeToItem={ ( id )=> removeToItem( cart, id ) }
+                        addToItem={ ( id )=> addToItem( cart, id ) }
+                    />
+                  )}
+              )}
           </table>
-          
+
 
           {
-            lines.length > 0 ? 
+            lines.length > 0 ?
            <> <Subtotal checkout={checkout} lines={lines} />
           <div
           style={{display:"flex",
@@ -110,14 +124,14 @@ const Cart: React.FC<{
             }}>Total Price:&nbsp;
             $ { ( checkout.subtotalPrice.gross.amount +  checkout.shippingPrice.gross.amount ).toFixed(2)  }
             </p>
-          </div> </>: 
+          </div> </>:
           <center>
             <br /><br /><br />
             <p>You haven't added items yet</p>
           </center>
           }
-           
-        </> 
+
+        </>
       )}
     </>
   );
